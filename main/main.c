@@ -15,12 +15,11 @@
 #include "nvs.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
-#include "protocol_examples_common.h"
 #include "errno.h"
 
 static const char TAG[] = "main";
 
-int main(void) 
+void app_main(void)
 {
-    return 0;
+    ESP_LOGI(TAG, "Running partition: %s", esp_ota_get_running_partition()->label);
 }

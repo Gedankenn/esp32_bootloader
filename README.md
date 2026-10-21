@@ -2,7 +2,7 @@
 
 Work-in-progress ESP-IDF project for an OTA (over-the-air) update setup on the ESP32, with a custom dual-OTA partition table.
 
-> **Status:** early stage / work in progress. The repository currently contains the project skeleton, the partition layout and the first OTA-related code. It is not yet a complete, buildable application (see [Current state](#current-state)).
+> **Status:** early stage / work in progress. The repository currently contains the project skeleton, the partition layout and the first OTA-related code (see [Current state](#current-state)).
 
 ## Overview
 
@@ -21,7 +21,7 @@ What is in the code today:
   | `ota_1`    | app  | ota_1   | `0x210000` | 1 MB   |
 
   The `sdkconfig` selects this custom table and a 4 MB flash size.
-- **OTA groundwork** (`main/bootloader.c`): includes the ESP-IDF OTA, partition, app-format and HTTP-client APIs and starts querying the running partition and OTA image state (`esp_ota_get_running_partition()`, `esp_ota_img_states_t`).
+- **OTA groundwork** (`main/bootloader.c`): includes the ESP-IDF OTA, partition, app-format and HTTP-client APIs; `bootloader_get_running_partition()` stores the running partition (`esp_ota_get_running_partition()`).
 - **Wi-Fi application stub** (`main/wifi_app.c`): `wifi_app_init()` initializes NVS flash, the network interface (`esp_netif`) and the default event loop.
 
 ## Hardware / target
@@ -38,7 +38,7 @@ esp32_bootloader/
 ├── partitions.csv     # custom partition table (factory + ota_0 + ota_1)
 ├── sdkconfig          # ESP-IDF configuration (ESP32, 4 MB flash, custom partitions)
 ├── main/
-│   ├── main.c         # entry point (placeholder)
+│   ├── main.c         # app_main(): logs the running partition
 │   ├── bootloader.c   # OTA / partition handling (in progress)
 │   ├── wifi_app.c     # NVS + netif + event loop initialization
 │   └── wifi_app.h
@@ -47,16 +47,11 @@ esp32_bootloader/
 
 ## Current state
 
-The project does not build as-is yet:
-
-- `main/CMakeLists.txt` (the `idf_component_register(...)` file ESP-IDF needs for the `main` component) is not in the repository.
-- `main/main.c` defines `int main(void)` instead of the ESP-IDF entry point `app_main()`, and does not call the other modules yet.
-- `main/bootloader.c` calls `esp_ota_get_running_partition()` in a global initializer, which C does not allow; it needs to move into a function.
-- `protocol_examples_common.h` is included, which requires the ESP-IDF `protocol_examples_common` example component to be added to the project.
+The project builds with ESP-IDF 5.4.1, but the application does not do anything yet beyond logging the running partition at boot: `app_main()` does not call the Wi-Fi or OTA code, and no OTA download/switch logic is implemented yet.
 
 ## Building and flashing
 
-Once the points above are in place, the standard ESP-IDF workflow applies:
+Standard ESP-IDF workflow:
 
 ```bash
 # with ESP-IDF 5.4.x installed and exported (. $IDF_PATH/export.sh)

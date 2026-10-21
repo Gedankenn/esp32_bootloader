@@ -13,8 +13,12 @@
 #include "nvs.h"
 #include "nvs_flash.h"
 #include "driver/gpio.h"
-#include "protocol_examples_common.h"
 #include "errno.h"
 
-const esp_partition_t *running = esp_ota_get_running_partition();
+const esp_partition_t *running;
 esp_ota_img_states_t ota_state;
+
+void bootloader_get_running_partition(void)
+{
+    running = esp_ota_get_running_partition();
+}
